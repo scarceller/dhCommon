@@ -67,6 +67,8 @@ module.exports =
   genPropertyId:     function (callback) { return _getNextId(_pknPropertyId,callback);     }, 
   genOfficeId:       function (callback) { return _getNextId(_pknOfficeId,callback);       }, 
   genNotificationId: function (callback) { return _getNextId(_pknNotificationId,callback); }, 
+  // create the Counter collection
+  createCounterColl: function (callback) { return _createCounterColl(callback);            },  
 
   // connects to the mongo DB and caches the connection and all refs
   dbInit: function(callback)
