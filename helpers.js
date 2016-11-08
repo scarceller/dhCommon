@@ -168,7 +168,7 @@ function _dbInit(callback)
 //   https://docs.mongodb.com/v3.0/tutorial/create-an-auto-incrementing-field/#auto-increment-counters-collection
 function _getNextId(idType,callback)
 {
-  console.log("helpers._getNextId(" + idType + ") has been called.");
+//  console.log("helpers._getNextId(" + idType + ") has been called.");
 
   var err = null;  // assume the function will not fail, return null err;
   var pkId = null; // the id that is generated
@@ -189,12 +189,12 @@ function _getNextId(idType,callback)
     { // callback for findAndModify() update
       if(!err && result.value)
       { // all is well, return the generated ID 
-        console.log("  ... Row found:" + JSON.stringify(result));
+//        console.log("  ... Row found:" + JSON.stringify(result));
       
         pkId = result.value.seq; // return the id generated from the returned record 
       
-        console.log("  ... result:" + JSON.stringify(result) );
-        console.log("  ... generated " + idType + ":" + pkId );
+//        console.log("  ... result:" + JSON.stringify(result) );
+//        console.log("  ... generated " + idType + ":" + pkId );
       
         callback(err,pkId);
       }
