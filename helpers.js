@@ -51,6 +51,7 @@ module.exports =
   //------------------------------------------------------------------------------
   // Public helper functions start here.
   //------------------------------------------------------------------------------
+  dburl:            function () { return _mongoURL;         }, 
   // export db refrence as well as dbConnected indicator
   dbref:            function () { return _dbref;            }, 
   dbConnected:      function () { return _dbConnectedInd;   },  
