@@ -125,6 +125,11 @@ function _dbInit(callback)
   // test to be sure we are not already connected
   if(_dbConnectedInd==false)
   { // not yet connected, proceed and connect.
+
+// test code
+var mongourl = process.env.mongourl || 'none';
+console.log("  ... DEBUG: mongourl->" + mongourl );
+
     // setup mongodb connection options
     var connectOptions = 
     { server: { poolSize:2,
