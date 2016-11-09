@@ -125,12 +125,6 @@ function _dbInit(callback)
   // test to be sure we are not already connected
   if(_dbConnectedInd==false)
   { // not yet connected, proceed and connect.
-
-// test code
-var port = process.env.OPENSHIFT_NODEJS_PORT || 0;
-var host = process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0';
-console.log("  ... DEBUG: ip:port->" + host + ":" + port );
-
     // setup mongodb connection options
     var connectOptions = 
     { server: { poolSize:2,
