@@ -16,8 +16,9 @@ var mongoClient        = require('mongodb').MongoClient;
 
 //------------------------------------------------------------------------------ 
 // define mongoDB related information
-// define the DB connection url
-var _mongoURL          = "mongodb://169.45.196.58:27017/dhOpenShift";
+// define the DB connection url, check for env var 'mongourl'
+//var _mongoURL          = process.env.mongourl || "mongodb://169.45.196.58:27017/dhOpenShift";
+var _mongoURL          = process.env.mongourl;
 // define the collection names within the DB
 var _cnameCounter      = "dhCounter";       // name of the counter collection.
 var _cnameClient       = "dhClient";        // name of the client collection.
@@ -125,11 +126,6 @@ function _dbInit(callback)
   // test to be sure we are not already connected
   if(_dbConnectedInd==false)
   { // not yet connected, proceed and connect.
-
-// test code
-var mongourl = process.env.mongourl || 'none';
-console.log("  ... DEBUG: mongourl->" + mongourl );
-
     // setup mongodb connection options
     var connectOptions = 
     { server: { poolSize:2,
