@@ -51,7 +51,7 @@ module.exports =
   //------------------------------------------------------------------------------
   // Public helper functions start here.
   //------------------------------------------------------------------------------
-  dburl:            function () { return _mongoURL;         }, 
+  dburl:            function () { return _mongoURL;         },
   // export db refrence as well as dbConnected indicator
   dbref:            function () { return _dbref;            }, 
   dbConnected:      function () { return _dbConnectedInd;   },  
@@ -120,11 +120,17 @@ module.exports =
 // connects once and only once to the DB and cache the connection
 function _dbInit(callback)
 {
-  console.log("helpers.dbConnect() has been called.");
+  console.log("helpers.dbInit() has been called.");
 
   // test to be sure we are not already connected
   if(_dbConnectedInd==false)
   { // not yet connected, proceed and connect.
+
+// test code
+var port = process.env.OPENSHIFT_NODEJS_PORT || 0;
+var host = process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0';
+console.log("  ... DEBUG: ip:port->" + host + ":" + port );
+
     // setup mongodb connection options
     var connectOptions = 
     { server: { poolSize:2,
