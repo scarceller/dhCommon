@@ -6,7 +6,7 @@
 //     Foundation
 //
 // Dream Home Application for node.js 
-// Author: Sal Carceller J.
+// Author: Sal Carceller Jr.
 // Date: 10/28/2016
 //
 // This helpers.js module contains common helper functions for Dream Home App
