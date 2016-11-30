@@ -17,7 +17,7 @@ var _mongoClient       = require('mongodb').MongoClient;
 //------------------------------------------------------------------------------ 
 // define mongoDB related information
 // define the DB connection url, check for env var 'mongourl'
-var _mongoURL          = process.env.mongourl || "mongodb://169.45.196.58:27017/dhOpenShift";
+var _mongoURL          = process.env.mongourl || "mongodb://169.45.196.58:27017/dhMSServiceFabric";
 // define the collection names within the DB
 var _cnameCounter      = "dhCounter";       // name of the counter collection.
 var _cnameClient       = "dhClient";        // name of the client collection.
