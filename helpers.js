@@ -19,12 +19,12 @@ var _mongoClient       = require('mongodb').MongoClient;
 // define the DB connection url, check for env var 'mongourl'
 var _mongoURL          = process.env.mongourl || "mongodb://169.45.196.58:27017/dhOpenShift";
 // define the collection names within the DB
-var _cnameCounter      = "dhCounter";       // name of the counter collection.
-var _cnameClient       = "dhClient";        // name of the client collection.
-var _cnameAgent        = "dhAgent";         // name of the agent collection.
-var _cnameProperty     = "dhProperty";      // name of the property collection.
-var _cnameOffice       = "dhOffice";        // name of the office collection.
-var _cnameNotification = "dhNotification";  // name of the notification collection.
+var _cnameCounter      = "dhCounterColl";       // name of the counter collection.
+var _cnameClient       = "dhClientColl";        // name of the client collection.
+var _cnameAgent        = "dhAgentColl";         // name of the agent collection.
+var _cnameProperty     = "dhPropertyColl";      // name of the property collection.
+var _cnameOffice       = "dhOfficeColl";        // name of the office collection.
+var _cnameNotification = "dhNotificationColl";  // name of the notification collection.
 // define the text names for each primary key 
 var _pknAgentId        = "agentId";
 var _pknClientId       = "clientId";
