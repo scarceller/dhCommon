@@ -164,6 +164,29 @@ function _dbInit(callback)
   }
 }
 
+// tries to locate the mongo DB within the same OpenShift project
+// looks for environment variable defs that point to the mongoDB
+// if these defs are found it uses these to create the mongoURL dynamically
+function _findMongoService()
+{
+  console.log("helpers._findMongoService() has been called.");
+
+  var host     = process.env.MONGODB_SERVICE_HOST;
+  var port     = process.env.MONGODB_SERVICE_PORT;
+
+  //var database = process.env.MONGODB_DATABASE || "dreamhome";
+  //var user     = process.env.MONGODB_USER     || "root";
+  //var password = process.env.MONGODB_PASSWORD || "Jan44Feb!";
+  var database = process.env.MONGODB_DATABASE;
+  var user     = process.env.MONGODB_USER;
+  var password = process.env.MONGODB_PASSWORD;
+
+  // Example URL endpoint "mongodb://root:Jan44Feb!@172.30.198.134:27017/dreamhome"
+  var mongoURL = "mongodb://"+user+":"+password+"@"+host+":"+port+"/"+database;
+
+  console.log(" . . . mongoURL="+mongoURL);
+}
+
 // generates a unique next id from the Counter collection
 // see this documentation for how we generate unique IDs: 
 //   https://docs.mongodb.com/v3.0/tutorial/create-an-auto-incrementing-field/#auto-increment-counters-collection
