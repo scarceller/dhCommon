@@ -151,7 +151,7 @@ function _dbInit(callback)
         // set/mark us as now connected to the DB 
         _dbConnectedInd = true;    
 
-        console.log("  ... connected to the DB successfully!");
+        console.log("  ... connected to the DB successfully! " + _mongoURL);
         callback();
       }
       else
@@ -189,7 +189,7 @@ function _findMongoService()
     var mongoURL = "mongodb://"+user+":"+password+"@"+host+":"+port+"/"+database;
   }
 
-  console.log(" . . . mongoURL="+mongoURL);
+  console.log(" ... mongoURL="+mongoURL);
 }
 
 // generates a unique next id from the Counter collection
