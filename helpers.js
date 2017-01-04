@@ -133,6 +133,7 @@ function _dbInit(callback)
     };
 
     // now connected to mongodb
+    _findMongoService();
     _mongoClient.connect(_mongoURL+'?maxPoolSize=8', connectOptions, function(err, database) 
     {
       if(!err)
