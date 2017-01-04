@@ -174,16 +174,20 @@ function _findMongoService()
 
   var host     = process.env.MONGODB_SERVICE_HOST;
   var port     = process.env.MONGODB_SERVICE_PORT;
+  if(host && port)
+  { // we have located the mongoDB service host:port via env vars
+    // let's look for the login details next
 
-  //var database = process.env.MONGODB_DATABASE || "dreamhome";
-  //var user     = process.env.MONGODB_USER     || "root";
-  //var password = process.env.MONGODB_PASSWORD || "Jan44Feb!";
-  var database = process.env.MONGODB_DATABASE;
-  var user     = process.env.MONGODB_USER;
-  var password = process.env.MONGODB_PASSWORD;
-
-  // Example URL endpoint "mongodb://root:Jan44Feb!@172.30.198.134:27017/dreamhome"
-  var mongoURL = "mongodb://"+user+":"+password+"@"+host+":"+port+"/"+database;
+    //var database = process.env.MONGODB_DATABASE || "dreamhome";
+    //var user     = process.env.MONGODB_USER     || "root";
+    //var password = process.env.MONGODB_PASSWORD || "Jan44Feb!";
+    var database = process.env.MONGODB_DATABASE;
+    var user     = process.env.MONGODB_USER;
+    var password = process.env.MONGODB_PASSWORD;
+   
+    // Example URL endpoint "mongodb://root:Jan44Feb!@172.30.198.134:27017/dreamhome"
+    var mongoURL = "mongodb://"+user+":"+password+"@"+host+":"+port+"/"+database;
+  }
 
   console.log(" . . . mongoURL="+mongoURL);
 }
