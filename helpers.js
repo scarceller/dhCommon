@@ -281,12 +281,12 @@ function _createCounterColl(callback)
     console.log("  ... Counter collection has been dropped, we will rebuid it now.");
 
     // Now rebuild/create the Counter collection and add the records.
-    // define all the counter records each with default sequence key 1000 - 5000
-    counterRecords = [{ _id:_pknAgentId,        seq:1000 },
-                      { _id:_pknPropertyId,     seq:2000 }, 
-                      { _id:_pknOfficeId,       seq:3000 }, 
-                      { _id:_pknClientId,       seq:4000 }, 
-                      { _id:_pknNotificationId, seq:5000 }
+    // define all the counter records each with default sequence key (1000 - 5000)
+    counterRecords = [{ _id:_pknAgentId,        seq:999  },
+                      { _id:_pknPropertyId,     seq:1999 }, 
+                      { _id:_pknOfficeId,       seq:2999 }, 
+                      { _id:_pknClientId,       seq:3999 }, 
+                      { _id:_pknNotificationId, seq:4999 }
                      ];
     // insert the records
     _crefCounter.insertMany( counterRecords, {w:1, j:true},
