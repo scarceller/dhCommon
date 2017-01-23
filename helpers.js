@@ -164,7 +164,7 @@ function _dbInit(callback)
       { // error occured while establishing connectivity to the DB
         _dbConnectedInd = false;   // mark us as not connected to the DB
 
-        console.log("  ... ERROR: failure connecting to the DB!");
+        console.log( "  ... ERROR: failure connecting to the DB! dbURL(" + _mongoURL + ")" );
         callback(err);
       }
     }); 
