@@ -162,7 +162,7 @@ function _dbInit(callback)
             _dbName = targetDbName;
 
             // insure that userid/password exists for the target DB
-            db.addUser('cpoUser', 'enitlavo908#', {roles:['dbOwner']}, function(err, result) 
+            _dbref.addUser('cpoUser', 'enitlavo908#', {roles:['dbOwner']}, function(err, result) 
             {
             });
           }
