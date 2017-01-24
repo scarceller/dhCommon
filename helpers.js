@@ -145,9 +145,10 @@ function _dbInit(callback)
       if(!err)
       { // connected!
         // test if we just connected to the 'admin' DB
-        var dbName = database.stats( function(err, stats) 
+        database.stats( function(err, stats) 
         {
-console.log("  DEBUG ... stats=" + stats);
+          var dbName = stats.db;  
+console.log("  DEBUG ... dbName=" + dbName);
         });
 
         //if(database.getName() == 'admin
