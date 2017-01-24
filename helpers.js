@@ -148,7 +148,7 @@ function _dbInit(callback)
         var dbName = database.getStats( function(err, stats) 
         {
 console.log("  DEBUG ... stats=" + stats);
-        }
+        });
 
         //if(database.getName() == 'admin
      // switch to the desired target database
