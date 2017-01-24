@@ -147,7 +147,6 @@ function _dbInit(callback)
         // save the refrence to the db
         _dbref             = database;
         // fetch refrences for all collection
-        _crefCounter       = _dbref.collection(_cnameCounter); 
         _crefClient        = _dbref.collection(_cnameClient); 
         _crefAgent         = _dbref.collection(_cnameAgent); 
         _crefProperty      = _dbref.collection(_cnameProperty); 
@@ -268,9 +267,12 @@ function _getNextId(idType,callback)
 
 // Creates the Counter collection 
 // WARNING: will destroy the current Counter collection if one already exists!
-function _createCounterColl(callback)
+function _createCounterColl(database, callback)
 {
   console.log("helpers._createCounterColl() has been called.");
+
+  // locate or create the counter collection within the given databse
+  _crefCounter       = database.collection(_cnameCounter); 
 
   var counterRecords;
 
