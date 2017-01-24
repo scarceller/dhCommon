@@ -144,6 +144,15 @@ function _dbInit(callback)
     {
       if(!err)
       { // connected!
+        // test if we just connected to the 'admin' DB
+        var dbName = database.getName();
+console.log("  DEBUG ... dbName=" + dbName);
+
+        //if(database.getName() == 'admin
+     // switch to the desired target database
+//     var database = helper.dbref().db("dhOpenShift");
+// console.log('  ... now using DB (dhOpenShift)');
+
         // save the refrence to the db
         _dbref             = database;
         // fetch refrences for all collection
@@ -267,12 +276,9 @@ function _getNextId(idType,callback)
 
 // Creates the Counter collection 
 // WARNING: will destroy the current Counter collection if one already exists!
-function _createCounterColl(database, callback)
+function _createCounterColl(callback)
 {
   console.log("helpers._createCounterColl() has been called.");
-
-  // locate or create the counter collection within the given databse
-  _crefCounter       = database.collection(_cnameCounter); 
 
   var counterRecords;
 
