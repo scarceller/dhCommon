@@ -174,6 +174,7 @@ function _dbInit(callback)
           }
 
           // fetch refrences for all collection
+          _crefCounter       = _dbref.collection(_cnameCounter); 
           _crefClient        = _dbref.collection(_cnameClient); 
           _crefAgent         = _dbref.collection(_cnameAgent); 
           _crefProperty      = _dbref.collection(_cnameProperty); 
