@@ -36,6 +36,7 @@ var _pknNotificationId = "notificationId";
 // global handles/refrences to the mongoDB and it's collections
 var _dbConnectedInd = false; // indicates if we are connected to the DB, initialized to false
 var _dbref;                  // refrence to the mongoDB connection
+var _dbName;                 // the name of the db we are using
 var _crefCounter;            // _cref are refrences to collections
 var _crefClient;             // ...
 var _crefAgent;              // ...
@@ -52,8 +53,9 @@ module.exports =
   // Public helper functions start here.
   //------------------------------------------------------------------------------
   dburl:            function () { return _mongoURL;         },
-  // export db refrence as well as dbConnected indicator
+  // export db refrence, db name and dbConnected indicator
   dbref:            function () { return _dbref;            }, 
+  dbName:           function () { return _dbName;           }, 
   dbConnected:      function () { return _dbConnectedInd;   },  
   // export getters for all collection refrences
   crefCounter:      function () { return _crefCounter;      },
@@ -145,31 +147,45 @@ function _dbInit(callback)
       if(!err)
       { // connected!
         // test if we just connected to the 'admin' DB
+        // fetch the db stats
         database.stats( function(err, stats) 
         {
-          var dbName = stats.db;  
-console.log("  DEBUG ... dbName=" + dbName);
+          // get the db name from the db stats
+          var dbName = stats.db;
+          if(dbName == 'admin')
+          { // we are in the 'admin' DB!
+            console.log("  ... we have connected to the admin DB, switching to the target DB now!");
+
+            // switch to the desired target database
+            var targetDbName = "dhOpenShift";
+            _dbref  = database.db(targetDbName);
+            _dbName = targetDbName;
+
+            // insure that userid/password exists for the target DB
+            db.addUser('cpoUser', 'enitlavo908#', {roles:['dbOwner']}, function(err, result) 
+            {
+            });
+          }
+          else
+          { // not in the 'admin' DB
+            // save the refrence to the db
+            _dbref  = database;
+            _dbName = dbName;
+          }
+
+          // fetch refrences for all collection
+          _crefClient        = _dbref.collection(_cnameClient); 
+          _crefAgent         = _dbref.collection(_cnameAgent); 
+          _crefProperty      = _dbref.collection(_cnameProperty); 
+          _crefOffice        = _dbref.collection(_cnameOffice); 
+          _crefNotification  = _dbref.collection(_cnameNotification); 
+
+          // set/mark us as now connected to the DB 
+          _dbConnectedInd = true;    
+
+          console.log("  ... connected to DB (" + _dbName + ") successfully! " + _mongoURL);
+          callback();
         });
-
-        //if(database.getName() == 'admin
-     // switch to the desired target database
-//     var database = helper.dbref().db("dhOpenShift");
-// console.log('  ... now using DB (dhOpenShift)');
-
-        // save the refrence to the db
-        _dbref             = database;
-        // fetch refrences for all collection
-        _crefClient        = _dbref.collection(_cnameClient); 
-        _crefAgent         = _dbref.collection(_cnameAgent); 
-        _crefProperty      = _dbref.collection(_cnameProperty); 
-        _crefOffice        = _dbref.collection(_cnameOffice); 
-        _crefNotification  = _dbref.collection(_cnameNotification); 
-   
-        // set/mark us as now connected to the DB 
-        _dbConnectedInd = true;    
-
-        console.log("  ... connected to the DB successfully! " + _mongoURL);
-        callback();
       }
       else
       { // error occured while establishing connectivity to the DB
