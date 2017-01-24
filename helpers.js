@@ -145,7 +145,7 @@ function _dbInit(callback)
       if(!err)
       { // connected!
         // test if we just connected to the 'admin' DB
-        var dbName = database.getName();
+        var dbName = database.DEFAULT_URL;
 console.log("  DEBUG ... dbName=" + dbName);
 
         //if(database.getName() == 'admin
