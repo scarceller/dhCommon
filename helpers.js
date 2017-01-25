@@ -168,7 +168,7 @@ function _dbInit(callback)
             {
                if(err)
                {
-                  console.log("  ... creating db user in target database failed!");
+                  console.log("  ... creating db user in target database failed! " + JSON.stringify(err) );
                }
                else
                {
