@@ -153,7 +153,7 @@ function _dbInit(callback)
     {
       if(!err)
       { // connected!
-        console.log("  ... initial mongourl used to connect to the DB (" + _mongourl + ")");
+        console.log("  ... initial mongourl used to connect to the DB (" + _mongoURL + ")");
 
         // test if we just connected to the 'admin' DB
         // we only connect to admin db from dhDatabase service, admin db required if we are creating a new DB
