@@ -162,8 +162,18 @@ function _dbInit(callback)
             _dbName = targetDbName;
 
             // insure that userid/password exists for the target DB
+            // we can do this async, we do not need to wait for the callback to continue.
+            // we will assume the user will be added corectly or already exists.
             _dbref.addUser('cpoUser', 'enitlavo908#', {roles:['dbOwner']}, function(err, result) 
             {
+               if(err)
+               {
+                  console.log("  ... creating db user in target database failed!");
+               }
+               else
+               {
+                  console.log("  ... creating db user in target database successfull.");
+               }
             });
           }
           else
