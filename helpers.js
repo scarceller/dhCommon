@@ -17,7 +17,14 @@ var _mongoClient       = require('mongodb').MongoClient;
 //------------------------------------------------------------------------------ 
 // define mongoDB related information
 // define the DB connection url, check for env var 'mongourl'
-var _mongoURL          = process.env.mongourl || "mongodb://169.45.196.58:27017/dhOpenShift";
+var _mongoURL          = process.env.mongourl || "mongoDB://cpoUser:enitlavo908#@158.85.248.111:8888/dhDatabase";
+
+// these next variables are used when creating destroying a DB, only used by dhDatabase service!
+// only used if we connect to the .../admin DB, only dhDatabase service ever connects to admin DB.
+var _dbTargetName  = process.env.MONGODB_DATABASE || "dhDatabase";   // the name of the desired DB
+var _dbTargetUser  = process.env.MONGODB_USER     || "cpoUser";      // userid for the desired DB
+var _dbTargetPswd  = process.env.MONGODB_PASSWORD || "enitlavo908#"; // password for the desired DB
+
 // define the collection names within the DB
 var _cnameCounter      = "dhCounterColl";       // name of the counter collection.
 var _cnameClient       = "dhClientColl";        // name of the client collection.
@@ -36,7 +43,7 @@ var _pknNotificationId = "notificationId";
 // global handles/refrences to the mongoDB and it's collections
 var _dbConnectedInd = false; // indicates if we are connected to the DB, initialized to false
 var _dbref;                  // refrence to the mongoDB connection
-var _dbName;                 // the name of the db we are using
+var _dbName;                 // the name of the db we are currently using
 var _crefCounter;            // _cref are refrences to collections
 var _crefClient;             // ...
 var _crefAgent;              // ...
@@ -146,7 +153,10 @@ function _dbInit(callback)
     {
       if(!err)
       { // connected!
+        console.log("  ... initial mongourl used to connect to the DB (" + _mongourl + ")");
+
         // test if we just connected to the 'admin' DB
+        // we only connect to admin db from dhDatabase service, admin db required if we are creating a new DB
         // fetch the db stats
         database.stats( function(err, stats) 
         {
@@ -154,25 +164,24 @@ function _dbInit(callback)
           var dbName = stats.db;
           if(dbName == 'admin')
           { // we are in the 'admin' DB!
-            console.log("  ... we have connected to the admin DB, switching to the target DB now!");
+            console.log("  ... we have connected to the admin DB, switching to the target DB (" + _dbTargetName + ") now!");
 
             // switch to the desired target database
-            var targetDbName = "dhOpenShift";
-            _dbref  = database.db(targetDbName);
-            _dbName = targetDbName;
+            _dbref  = database.db(_dbTargetName);
+            _dbName = _dbTargetName;
 
             // insure that userid/password exists for the target DB
             // we can do this async, we do not need to wait for the callback to continue.
             // we will assume the user will be added corectly or already exists.
-            _dbref.addUser('cpoUser', 'enitlavo908#', {roles:['dbOwner']}, function(err, result) 
+            _dbref.addUser(_dbTargetUser, _dbTargetPswd, {roles:['dbOwner']}, function(err, result) 
             {
                if(err)
                {
-                  console.log("  ... creating db user in target database failed! " + JSON.stringify(err) );
+                  console.log("  ... WARNING creating db user (" + _dbTargetUser + ") in target database failed, error details -> " + JSON.stringify(err) );
                }
                else
                {
-                  console.log("  ... creating db user in target database successfull.");
+                  console.log("  ... creating db user (" + _dbTargetUser + ") in target database successfull.");
                }
             });
           }
@@ -194,7 +203,7 @@ function _dbInit(callback)
           // set/mark us as now connected to the DB 
           _dbConnectedInd = true;    
 
-          console.log("  ... connected to DB (" + _dbName + ") successfully! " + _mongoURL);
+          console.log("  ... connected to target DB (" + _dbName + ") successfully! ");
           callback();
         });
       }
