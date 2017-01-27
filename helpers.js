@@ -17,13 +17,13 @@ var _mongoClient       = require('mongodb').MongoClient;
 //------------------------------------------------------------------------------ 
 // define mongoDB related information
 // define the DB connection url, check for env var 'mongourl'
-var _mongoURL          = process.env.mongourl || "mongoDB://cpoUser:enitlavo908#@158.85.248.111:8888/dhDatabase";
+var _mongoURL      = process.env.mongourl || "mongoDB://cpoUser:enitlavo908#@158.85.248.111:8888/dhDatabase";
 
 // these next variables are used when creating destroying a DB, only used by dhDatabase service!
 // only used if we connect to the .../admin DB, only dhDatabase service ever connects to admin DB.
-var _dbTargetName  = process.env.MONGODB_DATABASE || "dhDatabase";   // the name of the desired DB
-var _dbTargetUser  = process.env.MONGODB_USER     || "cpoUser";      // userid for the desired DB
-var _dbTargetPswd  = process.env.MONGODB_PASSWORD || "enitlavo908#"; // password for the desired DB
+var _dbTargetName  = process.env.mongoDatabase || "dhDatabase";   // the name of the desired DB
+var _dbTargetUser  = process.env.mongoUser     || "cpoUser";      // userid for the desired DB
+var _dbTargetPswd  = process.env.mongoPassword || "enitlavo908#"; // password for the desired DB
 
 // define the collection names within the DB
 var _cnameCounter      = "dhCounterColl";       // name of the counter collection.
