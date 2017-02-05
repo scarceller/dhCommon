@@ -17,15 +17,21 @@ var _mongoClient       = require('mongodb').MongoClient;
 //------------------------------------------------------------------------------ 
 // define mongoDB related information
 // define the DB connection url, check for env var 'mongourl'
-var _mongoURL          = process.env.mongourl || "mongoDB://cpoUser:enitlavo908#@158.85.248.111:8888/dhMSServiceFabric";
+var _mongoURL      = process.env.mongourl || “mongoDB://cpoUser:enitlavo908#@158.85.248.111:8888/dhMSServiceFabric";
+
+// these next variables are used when creating destroying a DB, only used by dhDatabase service!
+// only used if we connect to the .../admin DB, only dhDatabase service ever connects to admin DB.
+var _dbTargetName  = process.env.mongoDatabase || "dhDatabase";   // the name of the desired DB
+var _dbTargetUser  = process.env.mongoUser     || "cpoUser";      // userid for the desired DB
+var _dbTargetPswd  = process.env.mongoPassword || "enitlavo908#"; // password for the desired DB
 
 // define the collection names within the DB
-var _cnameCounter      = "dhCounter";       // name of the counter collection.
-var _cnameClient       = "dhClient";        // name of the client collection.
-var _cnameAgent        = "dhAgent";         // name of the agent collection.
-var _cnameProperty     = "dhProperty";      // name of the property collection.
-var _cnameOffice       = "dhOffice";        // name of the office collection.
-var _cnameNotification = "dhNotification";  // name of the notification collection.
+var _cnameCounter      = "dhCounterColl";       // name of the counter collection.
+var _cnameClient       = "dhClientColl";        // name of the client collection.
+var _cnameAgent        = "dhAgentColl";         // name of the agent collection.
+var _cnameProperty     = "dhPropertyColl";      // name of the property collection.
+var _cnameOffice       = "dhOfficeColl";        // name of the office collection.
+var _cnameNotification = "dhNotificationColl";  // name of the notification collection.
 // define the text names for each primary key 
 var _pknAgentId        = "agentId";
 var _pknClientId       = "clientId";
@@ -37,6 +43,7 @@ var _pknNotificationId = "notificationId";
 // global handles/refrences to the mongoDB and it's collections
 var _dbConnectedInd = false; // indicates if we are connected to the DB, initialized to false
 var _dbref;                  // refrence to the mongoDB connection
+var _dbName;                 // the name of the db we are currently using
 var _crefCounter;            // _cref are refrences to collections
 var _crefClient;             // ...
 var _crefAgent;              // ...
@@ -53,8 +60,9 @@ module.exports =
   // Public helper functions start here.
   //------------------------------------------------------------------------------
   dburl:            function () { return _mongoURL;         },
-  // export db refrence as well as dbConnected indicator
+  // export db refrence, db name and dbConnected indicator
   dbref:            function () { return _dbref;            }, 
+  dbName:           function () { return _dbName;           }, 
   dbConnected:      function () { return _dbConnectedInd;   },  
   // export getters for all collection refrences
   crefCounter:      function () { return _crefCounter;      },
@@ -126,6 +134,13 @@ function _dbInit(callback)
   // test to be sure we are not already connected
   if(_dbConnectedInd==false)
   { // not yet connected, proceed and connect.
+    // check if we have a local mongoDB service within the OpenShift project
+    var mongoURL = _findMongoService();
+    if( mongoURL )
+    { // we found a local mongoDB within OpenShift, we will now use this DB 
+      _mongoURL = mongoURL;
+    }
+
     // setup mongodb connection options
     var connectOptions = 
     { server: { poolSize:2,
@@ -133,36 +148,105 @@ function _dbInit(callback)
               }
     };
 
-    // now connected to mongodb
+    // now connect to mongodb
     _mongoClient.connect(_mongoURL+'?maxPoolSize=8', connectOptions, function(err, database) 
     {
       if(!err)
       { // connected!
-        // save the refrence to the db
-        _dbref             = database;
-        // fetch refrences for all collection
-        _crefCounter       = _dbref.collection(_cnameCounter); 
-        _crefClient        = _dbref.collection(_cnameClient); 
-        _crefAgent         = _dbref.collection(_cnameAgent); 
-        _crefProperty      = _dbref.collection(_cnameProperty); 
-        _crefOffice        = _dbref.collection(_cnameOffice); 
-        _crefNotification  = _dbref.collection(_cnameNotification); 
-   
-        // set/mark us as now connected to the DB 
-        _dbConnectedInd = true;    
+        console.log("  ... initial mongourl used to connect to the DB (" + _mongoURL + ")");
 
-        console.log("  ... connected to the DB successfully!");
-        callback();
+        // test if we just connected to the 'admin' DB
+        // we only connect to admin db from dhDatabase service, admin db required if we are creating a new DB
+        // fetch the db stats
+        database.stats( function(err, stats) 
+        {
+          // get the db name from the db stats
+          var dbName = stats.db;
+          if(dbName == 'admin')
+          { // we are in the 'admin' DB!
+            console.log("  ... we have connected to the admin DB, switching to the target DB (" + _dbTargetName + ") now!");
+
+            // switch to the desired target database
+            _dbref  = database.db(_dbTargetName);
+            _dbName = _dbTargetName;
+
+            // insure that userid/password exists for the target DB
+            // we can do this async, we do not need to wait for the callback to continue.
+            // we will assume the user will be added corectly or already exists.
+            _dbref.addUser(_dbTargetUser, _dbTargetPswd, {roles:['dbOwner']}, function(err, result) 
+            {
+               if(err)
+               {
+                  console.log("  ... WARNING creating db user (" + _dbTargetUser + ") in target database failed, error details -> " + JSON.stringify(err) );
+               }
+               else
+               {
+                  console.log("  ... creating db user (" + _dbTargetUser + ") in target database successfull.");
+               }
+            });
+          }
+          else
+          { // not in the 'admin' DB
+            // save the refrence to the db
+            _dbref  = database;
+            _dbName = dbName;
+          }
+
+          // fetch refrences for all collection
+          _crefCounter       = _dbref.collection(_cnameCounter); 
+          _crefClient        = _dbref.collection(_cnameClient); 
+          _crefAgent         = _dbref.collection(_cnameAgent); 
+          _crefProperty      = _dbref.collection(_cnameProperty); 
+          _crefOffice        = _dbref.collection(_cnameOffice); 
+          _crefNotification  = _dbref.collection(_cnameNotification); 
+
+          // set/mark us as now connected to the DB 
+          _dbConnectedInd = true;    
+
+          console.log("  ... connected to target DB (" + _dbName + ") successfully! ");
+          callback();
+        });
       }
       else
       { // error occured while establishing connectivity to the DB
         _dbConnectedInd = false;   // mark us as not connected to the DB
 
-        console.log("  ... ERROR: failure connecting to the DB!");
+        console.log( "  ... ERROR: failure connecting to the DB! dbURL(" + _mongoURL + ")" );
         callback(err);
       }
     }); 
   }
+}
+
+// tries to locate the mongo DB within the same OpenShift project
+// looks for environment variable defs that point to the mongoDB
+// if these defs are found it uses these to create the mongoURL dynamically
+function _findMongoService()
+{
+  console.log("helpers._findMongoService() has been called.");
+
+  var mongoURL = null;
+  var host     = process.env.MONGODB_SERVICE_HOST;
+  var port     = process.env.MONGODB_SERVICE_PORT;
+  if(host && port)
+  { // we have located the mongoDB service host:port via env vars
+    // let's look for the login details next
+
+    var database = process.env.MONGODB_DATABASE || "dreamhome";
+    var user     = process.env.MONGODB_USER     || "root";
+    var password = process.env.MONGODB_PASSWORD || "Jan44Feb!";
+    //var database = process.env.MONGODB_DATABASE;
+    //var user     = process.env.MONGODB_USER;
+    //var password = process.env.MONGODB_PASSWORD;
+   
+    // Example URL endpoint "mongodb://root:Jan44Feb!@172.30.198.134:27017/dreamhome"
+    mongoURL = "mongodb://"+user+":"+password+"@"+host+":"+port+"/"+database;
+
+    console.log("  ... local mongoDB found, URL="+mongoURL);
+  }
+
+
+  return mongoURL;
 }
 
 // generates a unique next id from the Counter collection
@@ -244,12 +328,12 @@ function _createCounterColl(callback)
     console.log("  ... Counter collection has been dropped, we will rebuid it now.");
 
     // Now rebuild/create the Counter collection and add the records.
-    // define all the counter records each with default sequence key set to 1000
-    counterRecords = [{ _id:_pknAgentId,        seq:1000 },
-                      { _id:_pknClientId,       seq:1000 }, 
-                      { _id:_pknPropertyId,     seq:1000 }, 
-                      { _id:_pknOfficeId,       seq:1000 }, 
-                      { _id:_pknNotificationId, seq:1000 }
+    // define all the counter records each with default sequence key (1000 - 5000)
+    counterRecords = [{ _id:_pknAgentId,        seq:999  },
+                      { _id:_pknPropertyId,     seq:1999 }, 
+                      { _id:_pknOfficeId,       seq:2999 }, 
+                      { _id:_pknClientId,       seq:3999 }, 
+                      { _id:_pknNotificationId, seq:4999 }
                      ];
     // insert the records
     _crefCounter.insertMany( counterRecords, {w:1, j:true},
